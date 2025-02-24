@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AZarOSO - Herramientas de Azar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+            background: #1a1a1a;
+        }
+
+        main {
+            flex: 1 0 auto;
+            padding: 20px;
+        }
+
+        nav {
+            background-color: #26a69a;
+        }
+
+        .brand-logo {
+            padding-left: 20px !important;
+        }
+
+        .sidenav {
+            background-color: #2a2a2a;
+        }
+
+        .sidenav li > a {
+            color: white;
+        }
+
+        .sidenav li > a:hover {
+            background-color: #26a69a;
+        }
+
+        .sidenav li > a > i {
+            color: #26a69a;
+        }
+
+        .sidenav li > a:hover > i {
+            color: white;
+        }
+
+        #content-frame {
+            width: 100%;
+            height: calc(100vh - 64px);
+            border: none;
+            background: #1a1a1a;
+        }
+
+        @media only screen and (max-width: 600px) {
+            #content-frame {
+                height: calc(100vh - 56px);
+            }
+            .brand-logo {
+                padding-left: 0 !important;
+            }
+        }
+
+        .welcome-content {
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .welcome-content h4 {
+            color: #26a69a;
+        }
+
+        .welcome-content .icon-block {
+            padding: 20px;
+        }
+
+        .welcome-content .icon-block i {
+            font-size: 48px;
+            color: #26a69a;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#!" class="brand-logo">AZarOSO</a>
+            <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="#" onclick="loadApp('ruleta')"><i class="material-icons left">rotate_right</i>Ruleta</a></li>
+                <li><a href="#" onclick="loadApp('dado')"><i class="material-icons left">casino</i>Dado</a></li>
+                <li><a href="#" onclick="loadApp('moneda')"><i class="material-icons left">monetization_on</i>Moneda</a></li>
+                <li><a href="#" onclick="loadApp('barajar')"><i class="material-icons left">style</i>Barajar</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <ul class="sidenav" id="mobile-nav">
+        <li><a href="#" onclick="loadApp('ruleta')"><i class="material-icons">rotate_right</i>Ruleta</a></li>
+        <li><a href="#" onclick="loadApp('dado')"><i class="material-icons">casino</i>Dado</a></li>
+        <li><a href="#" onclick="loadApp('moneda')"><i class="material-icons">monetization_on</i>Moneda</a></li>
+        <li><a href="#" onclick="loadApp('barajar')"><i class="material-icons">style</i>Barajar</a></li>
+    </ul>
+
+    <main>
+        <iframe id="content-frame" style="display: none;"></iframe>
+        <div id="welcome-screen" class="welcome-content">
+            <h4>Bienvenido a AZarOSO</h4>
+            <p class="flow-text">Tu conjunto de herramientas para decisiones aleatorias</p>
+            
+            <div class="row">
+                <div class="col s12 m6 l3">
+                    <div class="icon-block">
+                        <i class="material-icons">rotate_right</i>
+                        <h5>Ruleta</h5>
+                        <p>Gira la ruleta para seleccionar entre múltiples opciones</p>
+                    </div>
+                </div>
+                <div class="col s12 m6 l3">
+                    <div class="icon-block">
+                        <i class="material-icons">casino</i>
+                        <h5>Dado</h5>
+                        <p>Lanza un dado virtual para obtener números aleatorios</p>
+                    </div>
+                </div>
+                <div class="col s12 m6 l3">
+                    <div class="icon-block">
+                        <i class="material-icons">monetization_on</i>
+                        <h5>Moneda</h5>
+                        <p>Lanza una moneda para decisiones de cara o cruz</p>
+                    </div>
+                </div>
+                <div class="col s12 m6 l3">
+                    <div class="icon-block">
+                        <i class="material-icons">style</i>
+                        <h5>Barajar</h5>
+                        <p>Mezcla y selecciona elementos de una lista</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar componentes de Materialize
+            var sidenav = document.querySelectorAll('.sidenav');
+            M.Sidenav.init(sidenav);
+        });
+
+        function loadApp(app) {
+            const frame = document.getElementById('content-frame');
+            const welcome = document.getElementById('welcome-screen');
+            const appUrls = {
+                'ruleta': 'ruleta.html',
+                'dado': 'dado.html',
+                'moneda': 'moneda.html',
+                'barajar': 'barajar.html'
+            };
+
+            if (appUrls[app]) {
+                frame.style.display = 'block';
+                welcome.style.display = 'none';
+                frame.src = appUrls[app];
+                
+                // Cerrar sidenav en móviles
+                var instance = M.Sidenav.getInstance(document.querySelector('.sidenav'));
+                if (instance) {
+                    instance.close();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
