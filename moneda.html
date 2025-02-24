@@ -112,8 +112,8 @@
         const MAX_HEIGHT = 3;
         let targetRotation = { x: Math.PI / 2, y: 0 };
         let currentRotation = { x: Math.PI / 2, y: 0 };
-        let audio = new Audio('./assets/coinflic.mp3');
-        let audio_drop = new Audio('./assets/coindrop.mp3');
+        let audio = new Audio('./assets/sounds/coinflic.mp3');
+        let audio_drop = new Audio('./assets/sounds/coindrop.mp3');
         
         // [Previous designs object and texture creation functions remain the same]
         const designs = {
@@ -127,16 +127,16 @@
                 cruz: createDefaultTexture('CRUZ', '#silver', '#303030', true)
             },
             aztec: {
-                cara: createAztecTexture('CARA', './assets/caraAzteca.png'),
-                cruz: createAztecTexture('CRUZ', './assets/cruzAzteca.png')
+                cara: createAztecTexture('CARA', './assets/images/caraAzteca.png'),
+                cruz: createAztecTexture('CRUZ', './assets/images/cruzAzteca.png')
             },
             chinese: {
-                cara: createChineseTexture('CARA', './assets/caraChinese.png'),
-                cruz: createChineseTexture('CRUZ', './assets/cruzChinese.png')
+                cara: createChineseTexture('CARA', './assets/images/caraChinese.png'),
+                cruz: createChineseTexture('CRUZ', './assets/images/cruzChinese.png')
             },
             honduras: {
-                cara: createAztecTexture('CARA', './assets/caraHNL.png'),
-                cruz: createAztecTexture('CRUZ', './assets/cruzHNL.png')
+                cara: createAztecTexture('CARA', './assets/images/caraHNL.png'),
+                cruz: createAztecTexture('CRUZ', './assets/images/cruzHNL.png')
             }
         };
 
