@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Ruleta Dinámica con Tags</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .container {
+            padding: 5px;
+        }
+
+        #wheelOfFortune {
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            margin: 20px auto;
+        }
+
+        #wheel {
+            display: block;
+        }
+
+        #spin {
+            font: 1.5em/0 sans-serif;
+            user-select: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30%;
+            height: 30%;
+            margin: -15%;
+            background: #fff;
+            color: #fff;
+            box-shadow: 0 0 0 8px currentColor, 0 0px 15px 5px rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            transition: 0.8s;
+        }
+
+        #spin::after {
+            content: '';
+            position: absolute;
+            top: -17px;
+            border: 10px solid transparent;
+            border-bottom-color: currentColor;
+            border-top: none;
+        }
+
+        #spin.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #666 !important;
+        }
+
+        .controls-section {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 90%;
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            min-height: 100px;
+            background: #333;
+            border-radius: 5px;
+        }
+
+        .tag {
+            background: #4a4a4a;
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tag.disabled {
+            background: #2a2a2a;
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .tag-delete {
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #ff4444;
+            padding: 0 5px;
+        }
+
+        .tag-input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 5px;
+            flex-grow: 1;
+            min-width: 100px;
+        }
+
+        .tag-input:focus {
+            outline: none;
+        }
+
+        .modal {
+            background-color: #2a2a2a !important;
+            color: white !important;
+            border-radius: 15px !important;
+            max-width: 500px !important;
+        }
+
+        .modal .modal-content {
+            padding: 24px;
+        }
+
+        .modal .modal-footer {
+            background-color: #2a2a2a !important;
+            padding: 15px !important;
+            border-top: 1px solid #444 !important;
+        }
+
+        .modal h4 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .modal p {
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+
+        .result-text {
+            font-size: 2em;
+            color: #26a69a;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .modal-btn {
+            margin: 0 10px;
+        }
+
+        .btn-cancel {
+            background-color: #666 !important;
+        }
+
+        .btn-confirm {
+            background-color: #26a69a !important;
+        }
+
+        .clear-all-btn {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .clear-all-btn:hover {
+            background-color: #ff1111;
+        }
+
+        .error-message {
+            color: #ff4444;
+            text-align: center;
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m12 l6 center-container">
+                <div id="wheelOfFortune">
+                    <canvas id="wheel" width="400" height="400"></canvas>
+                    <div id="spin">GIRA</div>
+                </div>
+            </div>
+            <div class="col s12 m12 l6">
+                <div class="controls-section">
+                    <div id="tag-root"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Resultado -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <h4>¡Resultado!</h4>
+            <div class="result-text" id="modalResult"></div>
+            <p>¿Deseas tachar y ocultar este elemento de la ruleta?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-close waves-effect waves-light btn-flat btn-cancel modal-btn">No, mantener</button>
+            <button id="confirmDisable" class="modal-close waves-effect waves-light btn btn-confirm modal-btn">Sí, tachar</button>
+        </div>
+    </div>
+
+    <!-- Modal para elemento único -->
+    <div id="singleElementModal" class="modal">
+        <div class="modal-content">
+            <h4>¡Advertencia!</h4>
+            <p>Solo hay un elemento en la ruleta. ¿Deseas girarla de todos modos?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-close waves-effect waves-light btn-flat btn-cancel modal-btn">Cancelar</button>
+            <button id="confirmSingleSpin" class="modal-close waves-effect waves-light btn btn-confirm modal-btn">Girar</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        // Configuración inicial de la ruleta
+        const colors = ['#f82', '#0bf', '#fb0', '#0fb', '#b0f', '#f0b', '#bf0', '#82f', '#0fb'];
+        const rand = (m, M) => Math.random() * (M - m) + m;
+        const PI = Math.PI;
+        const TAU = 2 * PI;
+        let lastIndex = 0;
+
+        // Crear el sonido de tick
+        const tickAudio = new Audio('../../assets/sounds/rouletteclic.mp3');
+        tickAudio.volume = 0.5;
+
+        // Inicializar el modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const modals = document.querySelectorAll('.modal');
+            M.Modal.init(modals, {
+                dismissible: true,
+                opacity: 0.5,
+                inDuration: 300,
+                outDuration: 200
+            });
+        });
+
+        // Componente React para los tags
+        const TagInput = () => {
+            const [tags, setTags] = React.useState([
+                { id: '1', text: 'Elemento 1', disabled: false },
+                { id: '2', text: 'Elemento 2', disabled: false },
+                { id: '3', text: 'Elemento 3', disabled: false },
+                { id: '4', text: 'Elemento 4', disabled: false }
+            ]);
+            const [input, setInput] = React.useState('');
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter' && input.trim()) {
+                    setTags([...tags, { 
+                        id: Date.now().toString(), 
+                        text: input.trim(),
+                        disabled: false 
+                    }]);
+                    setInput('');
+                    updateWheel([...tags, { 
+                        id: Date.now().toString(), 
+                        text: input.trim(),
+                        disabled: false 
+                    }]);
+                }
+            };
+
+            const deleteTag = (tagId) => {
+                const newTags = tags.filter(tag => tag.id !== tagId);
+                setTags(newTags);
+                updateWheel(newTags);
+            };
+
+            const clearAllTags = () => {
+                setTags([]);
+                updateWheel([]);
+            };
+
+            const toggleTag = (tagId) => {
+                const newTags = tags.map(tag => 
+                    tag.id === tagId ? { ...tag, disabled: !tag.disabled } : tag
+                );
+                setTags(newTags);
+                updateWheel(newTags);
+            };
+
+            React.useEffect(() => {
+                window.disableTag = (text) => {
+                    const newTags = tags.map(tag => 
+                        tag.text === text ? { ...tag, disabled: true } : tag
+                    );
+                    setTags(newTags);
+                    updateWheel(newTags);
+                };
+            }, [tags]);
+
+            return React.createElement('div', null,
+                React.createElement('button', {
+                    className: 'clear-all-btn',
+                    onClick: clearAllTags
+                }, 'Limpiar todo'), 
+                React.createElement('div', { className: 'tag-container' },
+                    tags.map(tag => 
+                        React.createElement('div', { 
+                            key: tag.id,
+                            className: `tag ${tag.disabled ? 'disabled' : ''}`,
+                            onClick: () => toggleTag(tag.id)
+                        },
+                            React.createElement('span', null, tag.text),
+                            React.createElement('button', {
+                                className: 'tag-delete',
+                                onClick: (e) => {
+                                    e.stopPropagation();
+                                    deleteTag(tag.id);
+                                }
+                            }, '×')
+                        )
+                    ),
+                    React.createElement('input', {
+                        className: 'tag-input',
+                        value: input,
+                        onChange: (e) => setInput(e.target.value),
+                        onKeyDown: handleKeyDown,
+                        placeholder: 'Agregar elemento...'
+                    })
+                )
+            );
+        };
+
+        // Renderizar el componente de tags
+        ReactDOM.render(
+            React.createElement(TagInput),
+            document.getElementById('tag-root')
+        );
+
+        // Funciones de la ruleta
+        let sectors = [
+            { color: '#f82', label: 'Elemento 1' },
+            { color: '#0bf', label: 'Elemento 2' },
+            { color: '#fb0', label: 'Elemento 3' },
+            { color: '#0fb', label: 'Elemento 4' }
+        ];
+
+        const spinEl = document.querySelector('#spin');
+        const ctx = document.querySelector('#wheel').getContext('2d');
+        const dia = ctx.canvas.width;
+        const rad = dia / 2;
+        let arc = TAU / sectors.length;
+        let angVel = 0;
+        let ang = 0;
+
+        const getIndex = () => Math.floor(sectors.length - (ang / TAU) * sectors.length) % sectors.length;
+
+        function drawSector(sector, i) {
+            const ang = arc * i;
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = sector.color;
+            ctx.moveTo(rad, rad);
+            ctx.arc(rad, rad, rad, ang, ang + arc);
+            ctx.lineTo(rad, rad);
+            ctx.fill();
+            ctx.translate(rad, rad);
+            ctx.rotate(ang + arc / 2);
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 20px sans-serif';
+            const maxWidth = rad - 40;
+            let fontSize = 20;
+            ctx.font = `bold ${fontSize}px sans-serif`;
+            while (ctx.measureText(sector.label).width > maxWidth && fontSize > 10) {
+                fontSize--;
+                ctx.font = `bold ${fontSize}px sans-serif`;
+            }
+            ctx.fillText(sector.label, rad - 20, 10);
+            ctx.restore();
+        }
+
+        function rotate() {
+            const sector = sectors[getIndex()];
+            ctx.canvas.style.transform = `rotate(${ang - PI / 2}rad)`;
+            spinEl.textContent = !angVel ? 'GIRA' : sector.label;
+            spinEl.style.background = sector.color;
+        }
+
+        function showResultModal(resultado) {
+            const modal = M.Modal.getInstance(document.querySelector('#resultModal'));
+            document.getElementById('modalResult').textContent = resultado;
+            
+            document.getElementById('confirmDisable').onclick = () => {
+                window.disableTag(resultado);
+            };
+            
+            modal.open();
+        }
+
+        function frame() {
+            if (!angVel) return;
+            
+            // Reproducir sonido al pasar por un sector
+            const currentIndex = getIndex();
+            if (currentIndex !== lastIndex) {
+                tickAudio.currentTime = 0;
+                tickAudio.play();
+                lastIndex = currentIndex;
+            }
+            
+            angVel *= 0.991;
+            if (angVel < 0.002) {
+                angVel = 0;
+                const resultado = sectors[getIndex()].label;
+                showResultModal(resultado);
+            }
+            ang += angVel;
+            ang %= TAU;
+            rotate();
+        }
+
+        function validateAndSpin() {
+            if (sectors.length === 0) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = 'No hay elementos para girar la ruleta';
+                spinEl.parentNode.insertBefore(errorDiv, spinEl.nextSibling);
+                setTimeout(() => errorDiv.remove(), 3000);
+                return;
+            }
+
+            if (sectors.length === 1) {
+                const singleElementModal = M.Modal.getInstance(document.querySelector('#singleElementModal'));
+                document.getElementById('confirmSingleSpin').onclick = () => {
+                    angVel = rand(0.25, 0.45);
+                };
+                singleElementModal.open();
+            } else {
+                angVel = rand(0.25, 0.45);
+            }
+        }
+
+        function engine() {
+            frame();
+            requestAnimationFrame(engine);
+        }
+
+        function updateWheel(tags) {
+            const activeTags = tags.filter(tag => !tag.disabled);
+            sectors = activeTags.map((tag, index) => ({
+                color: colors[index % colors.length],
+                label: tag.text
+            }));
+            
+            arc = sectors.length ? TAU / sectors.length : TAU;
+            ctx.clearRect(0, 0, dia, dia);
+            
+            if (sectors.length === 0) {
+                ctx.fillStyle = '#333';
+                ctx.fillRect(0, 0, dia, dia);
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 24px sans-serif';
+                ctx.fillText('Agrega elementos', dia/2, dia/2);
+                spinEl.classList.add('disabled');
+            } else {
+                sectors.forEach(drawSector);
+                spinEl.classList.remove('disabled');
+            }
+            rotate();
+        }
+
+        // Inicialización
+        function init() {
+            sectors.forEach(drawSector);
+            rotate();
+            engine();
+            spinEl.addEventListener('click', () => {
+                if (!angVel) validateAndSpin();
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

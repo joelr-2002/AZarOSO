@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Dado 3D</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #1a1a1a;
+            color: white;
+            overflow: hidden;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        #diceContainer {
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .controls-section {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        #rollButton {
+            font-size: 1.5em;
+            margin: 10px;
+        }
+
+        .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="center-container">
+            <div id="diceContainer"></div>
+            
+            <div class="controls-section">
+                <button id="rollButton" class="btn waves-effect waves-light">
+                    LANZAR DADO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        let scene, camera, renderer, dice;
+        let isRolling = false;
+        const rotationSpeed = 0.1;
+        let targetRotation = { x: 0, y: 0, z: 0 };
+        let audio_roll = new Audio('../../assets/sounds/diceroll.mp3');
+
+        // Configuraciones corregidas para cada cara del dado
+        // En un dado estándar, los números opuestos suman 7
+        // 1 opuesto a 6, 2 opuesto a 5, 3 opuesto a 4
+        const faceConfigs = {
+            1: { rotation: { x: 0, y: 0, z: 0 } },             // Frente
+            6: { rotation: { x: Math.PI, y: 0, z: 0 } },       // Atrás
+            2: { rotation: { x: Math.PI/2, y: 0, z: 0 } },     // Arriba
+            5: { rotation: { x: -Math.PI/2, y: 0, z: 0 } },    // Abajo
+            3: { rotation: { x: 0, y: -Math.PI/2, z: 0 } },    // Derecha
+            4: { rotation: { x: 0, y: Math.PI/2, z: 0 } }      // Izquierda
+        };
+
+        function init() {
+            // Configurar escena
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(400, 400);
+            renderer.setClearColor(0x1a1a1a);
+            document.getElementById('diceContainer').appendChild(renderer.domElement);
+
+            // Crear geometría del dado
+            const geometry = new THREE.BoxGeometry(2, 2, 2);
+            const materials = [];
+
+            // Crear texturas para cada cara
+            // El orden de las caras en BoxGeometry es: right, left, top, bottom, front, back
+            // Reordenamos las texturas para que coincidan con la geometría
+            const faceOrder = [3, 4, 2, 5, 1, 6]; // Orden correcto para las caras
+            
+            for (let i = 0; i < 6; i++) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 128;
+                canvas.height = 128;
+                const context = canvas.getContext('2d');
+
+                // Fondo blanco
+                context.fillStyle = '#ffffff';
+                context.fillRect(0, 0, 128, 128);
+
+                // Dibujar puntos
+                context.fillStyle = '#000000';
+                drawDiceFace(context, faceOrder[i]);
+
+                const texture = new THREE.CanvasTexture(canvas);
+                materials.push(new THREE.MeshBasicMaterial({ map: texture }));
+            }
+
+            dice = new THREE.Mesh(geometry, materials);
+            scene.add(dice);
+
+            camera.position.z = 5;
+
+            // Añadir luz ambiental
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            animate();
+        }
+
+        function drawDiceFace(context, number) {
+            const dotPositions = {
+                1: [[64, 64]],
+                2: [[32, 32], [96, 96]],
+                3: [[32, 32], [64, 64], [96, 96]],
+                4: [[32, 32], [32, 96], [96, 32], [96, 96]],
+                5: [[32, 32], [32, 96], [64, 64], [96, 32], [96, 96]],
+                6: [[32, 32], [32, 64], [32, 96], [96, 32], [96, 64], [96, 96]]
+            };
+
+            context.beginPath();
+            dotPositions[number].forEach(pos => {
+                context.moveTo(pos[0], pos[1]);
+                context.arc(pos[0], pos[1], 10, 0, Math.PI * 2);
+            });
+            context.fill();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (isRolling) {
+                dice.rotation.x += rotationSpeed;
+                dice.rotation.y += rotationSpeed;
+                dice.rotation.z += rotationSpeed;
+            } else {
+                // Suavizar la rotación hacia el objetivo
+                dice.rotation.x += (targetRotation.x - dice.rotation.x) * 0.1;
+                dice.rotation.y += (targetRotation.y - dice.rotation.y) * 0.1;
+                dice.rotation.z += (targetRotation.z - dice.rotation.z) * 0.1;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function rollDice() {
+            if (isRolling) return;
+
+            isRolling = true;
+            const rollDuration = 700; // 0.7 segundo
+            const result = Math.floor(Math.random() * 6) + 1;
+
+            audio_roll.play();
+
+            setTimeout(() => {
+                isRolling = false;
+                targetRotation = faceConfigs[result].rotation;
+                M.toast({html: `¡Resultado: ${result}!`, classes: 'rounded'});
+            }, rollDuration);
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            document.getElementById('rollButton').addEventListener('click', rollDice);
+        });
+    </script>
+</body>
+</html>

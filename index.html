@@ -4,113 +4,7 @@
     <title>AZarOSO - Herramientas de Azar</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        body {
-            display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-            background: #1a1a1a;
-        }
-
-        main {
-            flex: 1 0 auto;
-            padding: 20px;
-        }
-
-        nav {
-            background-color: #26a69a;
-        }
-
-        .brand-logo {
-            padding-left: 20px !important;
-        }
-
-        .sidenav {
-            background-color: #2a2a2a;
-        }
-
-        .sidenav li > a {
-            color: white;
-        }
-
-        .sidenav li > a:hover {
-            background-color: #26a69a;
-        }
-
-        .sidenav li > a > i {
-            color: #26a69a;
-        }
-
-        .sidenav li > a:hover > i {
-            color: white;
-        }
-
-        #content-frame {
-            width: 100%;
-            height: calc(100vh - 64px);
-            border: none;
-            background: #1a1a1a;
-        }
-
-        @media only screen and (max-width: 600px) {
-            #content-frame {
-                height: calc(100vh - 56px);
-            }
-            .brand-logo {
-                padding-left: 0 !important;
-            }
-        }
-
-        .welcome-content {
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .welcome-content h4 {
-            color: #26a69a;
-        }
-
-        .welcome-content .icon-block {
-            padding: 20px;
-        }
-
-        .welcome-content .icon-block i {
-            font-size: 48px;
-            color: #26a69a;
-        }
-
-        .icon-block {
-            transition: all 0.3s ease;
-            cursor: pointer;
-            padding: 20px;
-            border-radius: 8px;
-            background: #2a2a2a;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .icon-block:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            background: #333333;
-        }
-
-        .icon-block i {
-            font-size: 48px;
-            color: #26a69a;
-            display: block;
-            margin-bottom: 15px;
-        }
-
-        .icon-block h5 {
-            color: #26a69a;
-            margin-bottom: 10px;
-        }
-
-        .icon-block p {
-            color: #ffffff;
-        }
-    </style>
+    <link rel="stylesheet" href="./assets/styles/index.css">
 </head>
 <body>
     <nav>
@@ -118,7 +12,6 @@
             <a href="index.html" class="brand-logo">AZarOSO</a>
             <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
             <ul class="right hide-on-med-and-down">
-                <li><a href="index.html"><i class="material-icons left">home</i>Inicio</a></li>
                 <li><a href="#" onclick="loadApp('ruleta')"><i class="material-icons left">rotate_right</i>Ruleta</a></li>
                 <li><a href="#" onclick="loadApp('dado')"><i class="material-icons left">casino</i>Dado</a></li>
                 <li><a href="#" onclick="loadApp('moneda')"><i class="material-icons left">monetization_on</i>Moneda</a></li>
@@ -128,10 +21,11 @@
     </nav>
 
     <ul class="sidenav" id="mobile-nav">
-        <li><a href="#" onclick="loadApp('ruleta')"><i class="material-icons">rotate_right</i>Ruleta</a></li>
-        <li><a href="#" onclick="loadApp('dado')"><i class="material-icons">casino</i>Dado</a></li>
-        <li><a href="#" onclick="loadApp('moneda')"><i class="material-icons">monetization_on</i>Moneda</a></li>
-        <li><a href="#" onclick="loadApp('barajar')"><i class="material-icons">style</i>Barajar</a></li>
+        <li><a href="index.html"><i class="material-icons left white-text">home</i>Inicio</a></li>
+        <li><a href="#" onclick="loadApp('ruleta')"><i class="material-icons white-text">rotate_right</i>Ruleta</a></li>
+        <li><a href="#" onclick="loadApp('dado')"><i class="material-icons white-text">casino</i>Dado</a></li>
+        <li><a href="#" onclick="loadApp('moneda')"><i class="material-icons white-text">monetization_on</i>Moneda</a></li>
+        <li><a href="#" onclick="loadApp('barajar')"><i class="material-icons white-text">style</i>Barajar</a></li>
     </ul>
 
     <main>
@@ -174,35 +68,6 @@
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar componentes de Materialize
-            var sidenav = document.querySelectorAll('.sidenav');
-            M.Sidenav.init(sidenav);
-        });
-
-        function loadApp(app) {
-            const frame = document.getElementById('content-frame');
-            const welcome = document.getElementById('welcome-screen');
-            const appUrls = {
-                'ruleta': 'ruleta.html',
-                'dado': 'dado.html',
-                'moneda': 'moneda.html',
-                'barajar': 'barajar.html'
-            };
-
-            if (appUrls[app]) {
-                frame.style.display = 'block';
-                welcome.style.display = 'none';
-                frame.src = appUrls[app];
-                
-                // Cerrar sidenav en móviles
-                var instance = M.Sidenav.getInstance(document.querySelector('.sidenav'));
-                if (instance) {
-                    instance.close();
-                }
-            }
-        }
-    </script>
+    <script src="./assets/scripts/index.js"></script>
 </body>
 </html>

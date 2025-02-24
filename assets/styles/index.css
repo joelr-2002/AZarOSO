@@ -1,0 +1,106 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background: #1a1a1a;
+}
+
+main {
+    flex: 1 0 auto;
+    padding: 20px;
+}
+
+nav {
+    background-color: #26a69a;
+}
+
+.brand-logo {
+    padding-left: 20px !important;
+}
+
+.sidenav {
+    background-color: #2a2a2a;
+}
+
+.sidenav li > a {
+    color: white;
+}
+
+.sidenav li > a:hover {
+    background-color: #26a69a;
+}
+
+.sidenav li > a > i {
+    color: #26a69a;
+}
+
+.sidenav li > a:hover > i {
+    color: white;
+}
+
+#content-frame {
+    width: 100%;
+    height: calc(100vh - 64px);
+    border: none;
+    background: #1a1a1a;
+}
+
+@media only screen and (max-width: 600px) {
+    #content-frame {
+        height: calc(100vh - 56px);
+    }
+    .brand-logo {
+        padding-left: 0 !important;
+    }
+}
+
+.welcome-content {
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.welcome-content h4 {
+    color: #26a69a;
+}
+
+.welcome-content .icon-block {
+    padding: 20px;
+}
+
+.welcome-content .icon-block i {
+    font-size: 48px;
+    color: #26a69a;
+}
+
+.icon-block {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    padding: 20px;
+    border-radius: 8px;
+    background: #2a2a2a;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin-top: 25px;
+}
+
+.icon-block:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    background: #333333;
+}
+
+.icon-block i {
+    font-size: 48px;
+    color: #26a69a;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.icon-block h5 {
+    color: #26a69a;
+    margin-bottom: 10px;
+}
+
+.icon-block p {
+    color: #ffffff;
+}
