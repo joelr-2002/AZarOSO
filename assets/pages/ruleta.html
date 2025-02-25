@@ -6,194 +6,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            min-height: 100vh;
-            background: #1a1a1a;
-            color: white;
-        }
-
-        .container {
-            padding: 5px;
-        }
-
-        #wheelOfFortune {
-            display: inline-block;
-            position: relative;
-            overflow: hidden;
-            margin: 20px auto;
-        }
-
-        #wheel {
-            display: block;
-        }
-
-        #spin {
-            font: 1.5em/0 sans-serif;
-            user-select: none;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 30%;
-            height: 30%;
-            margin: -15%;
-            background: #fff;
-            color: #fff;
-            box-shadow: 0 0 0 8px currentColor, 0 0px 15px 5px rgba(0, 0, 0, 0.6);
-            border-radius: 50%;
-            transition: 0.8s;
-        }
-
-        #spin::after {
-            content: '';
-            position: absolute;
-            top: -17px;
-            border: 10px solid transparent;
-            border-bottom-color: currentColor;
-            border-top: none;
-        }
-
-        #spin.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: #666 !important;
-        }
-
-        .controls-section {
-            background: #2a2a2a;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px auto;
-            width: 90%;
-        }
-
-        .tag-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 10px;
-            min-height: 100px;
-            background: #333;
-            border-radius: 5px;
-        }
-
-        .tag {
-            background: #4a4a4a;
-            padding: 5px 10px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .tag.disabled {
-            background: #2a2a2a;
-            text-decoration: line-through;
-            opacity: 0.5;
-        }
-
-        .tag-delete {
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: #ff4444;
-            padding: 0 5px;
-        }
-
-        .tag-input {
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 5px;
-            flex-grow: 1;
-            min-width: 100px;
-        }
-
-        .tag-input:focus {
-            outline: none;
-        }
-
-        .modal {
-            background-color: #2a2a2a !important;
-            color: white !important;
-            border-radius: 15px !important;
-            max-width: 500px !important;
-        }
-
-        .modal .modal-content {
-            padding: 24px;
-        }
-
-        .modal .modal-footer {
-            background-color: #2a2a2a !important;
-            padding: 15px !important;
-            border-top: 1px solid #444 !important;
-        }
-
-        .modal h4 {
-            color: white;
-            margin-top: 0;
-        }
-
-        .modal p {
-            font-size: 1.2em;
-            margin: 20px 0;
-        }
-
-        .result-text {
-            font-size: 2em;
-            color: #26a69a;
-            text-align: center;
-            margin: 20px 0;
-            padding: 20px;
-            background: #333;
-            border-radius: 10px;
-        }
-
-        .modal-btn {
-            margin: 0 10px;
-        }
-
-        .btn-cancel {
-            background-color: #666 !important;
-        }
-
-        .btn-confirm {
-            background-color: #26a69a !important;
-        }
-
-        .clear-all-btn {
-            background-color: #ff4444;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-bottom: 10px;
-            transition: background-color 0.3s;
-        }
-
-        .clear-all-btn:hover {
-            background-color: #ff1111;
-        }
-
-        .error-message {
-            color: #ff4444;
-            text-align: center;
-            margin: 10px 0;
-            font-size: 1.2em;
-        }
-    </style>
+    <link rel="stylesheet" href="../../assets/styles/ruleta.css">
 </head>
 <body>
     <div class="container">
@@ -263,39 +76,50 @@
 
         // Componente React para los tags
         const TagInput = () => {
-            const [tags, setTags] = React.useState([
-                { id: '1', text: 'Elemento 1', disabled: false },
-                { id: '2', text: 'Elemento 2', disabled: false },
-                { id: '3', text: 'Elemento 3', disabled: false },
-                { id: '4', text: 'Elemento 4', disabled: false }
-            ]);
+            // Cargar los tags del localStorage o usar los predeterminados
+            const loadSavedTags = () => {
+                const savedTags = localStorage.getItem('ruletaTags');
+                if (savedTags) {
+                    return JSON.parse(savedTags);
+                }
+                return [
+                    { id: '1', text: 'Elemento 1', disabled: false },
+                    { id: '2', text: 'Elemento 2', disabled: false },
+                    { id: '3', text: 'Elemento 3', disabled: false },
+                    { id: '4', text: 'Elemento 4', disabled: false }
+                ];
+            };
+
+            const [tags, setTags] = React.useState(loadSavedTags());
             const [input, setInput] = React.useState('');
+
+            // Guardar tags en localStorage cada vez que cambien
+            React.useEffect(() => {
+                localStorage.setItem('ruletaTags', JSON.stringify(tags));
+                updateWheel(tags);
+            }, [tags]);
 
             const handleKeyDown = (e) => {
                 if (e.key === 'Enter' && input.trim()) {
-                    setTags([...tags, { 
+                    const newTags = [...tags, { 
                         id: Date.now().toString(), 
                         text: input.trim(),
                         disabled: false 
-                    }]);
+                    }];
+                    setTags(newTags);
                     setInput('');
-                    updateWheel([...tags, { 
-                        id: Date.now().toString(), 
-                        text: input.trim(),
-                        disabled: false 
-                    }]);
                 }
             };
 
             const deleteTag = (tagId) => {
                 const newTags = tags.filter(tag => tag.id !== tagId);
                 setTags(newTags);
-                updateWheel(newTags);
             };
 
             const clearAllTags = () => {
-                setTags([]);
-                updateWheel([]);
+                if (confirm('¿Estás seguro de que deseas eliminar todos los elementos?')) {
+                    setTags([]);
+                }
             };
 
             const toggleTag = (tagId) => {
@@ -303,7 +127,6 @@
                     tag.id === tagId ? { ...tag, disabled: !tag.disabled } : tag
                 );
                 setTags(newTags);
-                updateWheel(newTags);
             };
 
             React.useEffect(() => {
@@ -312,15 +135,22 @@
                         tag.text === text ? { ...tag, disabled: true } : tag
                     );
                     setTags(newTags);
-                    updateWheel(newTags);
                 };
             }, [tags]);
 
             return React.createElement('div', null,
-                React.createElement('button', {
-                    className: 'clear-all-btn',
-                    onClick: clearAllTags
-                }, 'Limpiar todo'), 
+                React.createElement('div', { className: 'buttons-container' },
+                    React.createElement('button', {
+                        className: 'clear-all-btn',
+                        onClick: clearAllTags
+                    }, 'Limpiar todo'),
+                    React.createElement('button', {
+                        className: 'save-btn',
+                        onClick: () => {
+                            M.toast({html: '¡Elementos guardados correctamente!', classes: 'rounded'});
+                        }
+                    }, 'Guardar cambios')
+                ),
                 React.createElement('div', { className: 'tag-container' },
                     tags.map(tag => 
                         React.createElement('div', { 
@@ -401,8 +231,12 @@
         function rotate() {
             const sector = sectors[getIndex()];
             ctx.canvas.style.transform = `rotate(${ang - PI / 2}rad)`;
-            spinEl.textContent = !angVel ? 'GIRA' : sector.label;
-            spinEl.style.background = sector.color;
+            if (sector) {
+                spinEl.textContent = !angVel ? 'GIRA' : sector.label;
+                spinEl.style.background = sector.color;
+            } else {
+                spinEl.textContent = 'GIRA';
+            }
         }
 
         function showResultModal(resultado) {
@@ -491,13 +325,50 @@
 
         // Inicialización
         function init() {
-            sectors.forEach(drawSector);
+            // Cargar los tags desde localStorage (si existen)
+            try {
+                const savedTags = localStorage.getItem('ruletaTags');
+                if (savedTags) {
+                    const parsedTags = JSON.parse(savedTags);
+                    updateWheel(parsedTags);
+                } else {
+                    sectors.forEach(drawSector);
+                }
+            } catch (e) {
+                console.error('Error al cargar datos del localStorage:', e);
+                sectors.forEach(drawSector);
+            }
+            
             rotate();
             engine();
             spinEl.addEventListener('click', () => {
                 if (!angVel) validateAndSpin();
             });
         }
+
+        // Agregar un poco de CSS para el botón de guardar
+        const style = document.createElement('style');
+        style.textContent = `
+            .buttons-container {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+            }
+            .save-btn {
+                background-color: #26a69a;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 8px 16px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                margin-bottom: 10px;
+            }
+            .save-btn:hover {
+                background-color: #2bbbad;
+            }
+        `;
+        document.head.appendChild(style);
 
         init();
     </script>

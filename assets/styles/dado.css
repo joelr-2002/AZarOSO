@@ -1,0 +1,75 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background: #1a1a1a;
+    color: white;
+    overflow: hidden;
+}
+
+.container {
+    padding: 20px;
+}
+
+#diceContainer {
+    width: 400px;
+    height: 400px;
+    margin: 20px auto;
+    position: relative;
+}
+
+.controls-section {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 800px;
+    text-align: center;
+}
+
+#rollButton {
+    font-size: 1.5em;
+    margin: 10px;
+}
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.switch-field {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.switch-field label {
+    background-color: #444;
+    color: #fff;
+    font-size: 14px;
+    text-align: center;
+    padding: 8px 16px;
+    margin-right: 8px;
+    border-radius: 4px;
+    transition: all 0.1s ease-in-out;
+    cursor: pointer;
+}
+
+.switch-field input {
+    display: none;
+}
+
+.switch-field input:checked + label {
+    background-color: #26a69a;
+}
+
+.result-display {
+    font-size: 1.5em;
+    margin: 10px 0;
+}

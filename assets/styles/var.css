@@ -1,0 +1,18 @@
+/* variables */
+:root {
+    --color-bg-dark: #1a1a1a;
+    --color-bg-light: #fff;
+    --color-text-dark: #333;
+    --color-text-light: #fff;
+    --color-primary: #26a69a;
+    --color-secondary: #ff4444;
+    --color-accent: #ffbb33;
+    --color-success: #43a047;
+    --color-error: #d32f2f;
+    --color-warning: #ffa000;
+    --color-info: #1976d2;
+    --color-link: #26a69a;
+    --color-link-hover: #2bbbad;
+    --color-link-visited: #26a69a;
+    --color-link-active: #ff4444;
+}

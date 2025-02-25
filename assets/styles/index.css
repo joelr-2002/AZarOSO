@@ -1,8 +1,10 @@
+@import url('./var.css');
+
 body {
     display: flex;
     min-height: 100vh;
     flex-direction: column;
-    background: #1a1a1a;
+    background: var(--color-bg-dark);
 }
 
 main {
